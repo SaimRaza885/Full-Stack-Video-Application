@@ -77,7 +77,7 @@ const getUserChannelSubscribers = asyncHandler(async (req, res) => {
               },
             },
           },
-        
+
         ],
       },
     },
@@ -160,6 +160,7 @@ const getSubscribedChannels = asyncHandler(async (req, res) => {
         subscribedChannels: {
           username: 1,
           fullName: 1,
+          avatar: 1,
           latestVideo: {
             "videoFile.url": 1,
             "thumbnail.url": 1,
@@ -178,7 +179,7 @@ const getSubscribedChannels = asyncHandler(async (req, res) => {
   if (!Subscribed_Channel.length) {
     return res
       .status(200)
-      .json(new ApiResponse(200,"No subscribed channels found"));
+      .json(new ApiResponse(200, "No subscribed channels found"));
   }
 
   return res
