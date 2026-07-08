@@ -13,13 +13,18 @@ export const Register = () => {
     password: '',
     confirmPassword: '',
     avatar: null,
+    coverImage: null, // Good practice to declare this explicitly
   })
   const [avatarPreview, setAvatarPreview] = useState(null)
+  const [coverImagePreview, setCoverImagePreview] = useState(null) // Fixed typo here
   const [errors, setErrors] = useState({})
+
   const { register, loading, error } = useAuth()
   const { addNotification } = useUI()
   const navigate = useNavigate()
+
   const fileInputRef = useRef(null)
+  const coverImageRef = useRef(null)
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -36,6 +41,15 @@ export const Register = () => {
     }
   }
 
+  const handleCoverImageSelect = (e) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      setFormData(prev => ({ ...prev, coverImage: file }))
+      setCoverImagePreview(URL.createObjectURL(file)) // Fixed typo
+      if (errors.coverImage) setErrors(prev => ({ ...prev, coverImage: '' })) // Fixed avatar validation leak
+    }
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     const newErrors = {}
@@ -45,7 +59,11 @@ export const Register = () => {
     if (!formData.password) newErrors.password = 'Password is required'
     if (formData.password.length < 6) newErrors.password = 'Password must be at least 6 characters'
     if (formData.password !== formData.confirmPassword) newErrors.confirmPassword = 'Passwords do not match'
-    if (Object.keys(newErrors).length > 0) { setErrors(newErrors); return }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors)
+      return
+    }
 
     const formPayload = new FormData()
     formPayload.append('fullName', formData.fullName)
@@ -53,13 +71,14 @@ export const Register = () => {
     formPayload.append('username', formData.username)
     formPayload.append('password', formData.password)
     if (formData.avatar) formPayload.append('avatar', formData.avatar)
+    if (formData.coverImage) formPayload.append('coverImage', formData.coverImage)
 
     const result = await register(formPayload)
     if (result.success) {
       addNotification('Registration successful! Redirecting...', 'success')
       navigate('/')
     } else {
-      addNotification(result.error, 'error')
+      addNotification(result.error || 'Registration failed', 'error')
     }
   }
 
@@ -77,6 +96,28 @@ export const Register = () => {
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
+            {/* coverImage Selection Panel */}
+            <div className="relative">
+              <div
+                onClick={() => coverImageRef.current?.click()}
+                className="h-20 bg-tertiary border-2 border-dashed border-border-subtle hover:border-accent/50 flex items-center justify-center cursor-pointer transition-colors overflow-hidden rounded-xl"
+              >
+                {coverImagePreview ? (
+                  <img src={coverImagePreview} alt="Cover Preview" className="w-full h-full object-cover" />
+                ) : (
+                  <div className='flex items-center gap-1'>
+                    <User className="w-6 h-6 text-text-tertiary" />
+                    <span className='text-sm text-gray-500 italic'>Upload Cover Image</span>
+                  </div>
+                )}
+                <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+                  <Upload className="w-5 h-5 text-white" />
+                </div>
+              </div>
+              <input ref={coverImageRef} type="file" accept="image/*" className="hidden" onChange={handleCoverImageSelect} />
+            </div>
+
+            {/* Avatar Selection Circle */}
             <div className="flex justify-center">
               <div className="relative">
                 <div
@@ -86,7 +127,10 @@ export const Register = () => {
                   {avatarPreview ? (
                     <img src={avatarPreview} alt="Avatar" className="w-full h-full object-cover" />
                   ) : (
-                    <User className="w-8 h-8 text-text-tertiary" />
+                    <div className='flex flex-col items-center'>
+                      <User className="w-6 h-6 text-text-tertiary" />
+                      <span className='text-[10px] text-gray-500 italic'>Avatar</span>
+                    </div>
                   )}
                   <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity rounded-full">
                     <Upload className="w-5 h-5 text-white" />

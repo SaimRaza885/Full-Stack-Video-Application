@@ -4,7 +4,7 @@ import { videoAPI, commentAPI, likeAPI, channelAPI, playlistAPI } from '../servi
 import { Button, Skeleton } from '../components'
 import { useAuth } from '../context/AuthContext'
 import { useUI } from '../context/UIContext'
-import { ThumbsUp, ThumbsDown, Share2, BookmarkPlus, User, Check, ListMusic, Trash2 } from 'lucide-react'
+import { ThumbsUp, ThumbsDown, Share2, BookmarkPlus, User, Check, ListMusic, Trash2, Pencil } from 'lucide-react'
 import { fmt, ago } from '../utils'
 
 export const VideoPlayer = () => {
@@ -29,21 +29,27 @@ export const VideoPlayer = () => {
   const [playlists, setPlaylists] = useState([])
   const [showPlaylistMenu, setShowPlaylistMenu] = useState(false)
   const [savingToPlaylist, setSavingToPlaylist] = useState(null)
+  const [newPlaylistName, setNewPlaylistName] = useState('')
+  const [creatingPlaylist, setCreatingPlaylist] = useState(false)
 
   const viewTracked = useRef(false)
 
-  useEffect(() => {
+  const refreshPlaylists = useCallback(() => {
     if (isAuthenticated) {
       playlistAPI.getUserPlaylists(user._id).then(res => {
         setPlaylists(res.data.data || [])
-      }).catch(() => {})
+      }).catch(() => { })
     }
   }, [isAuthenticated, user])
 
   useEffect(() => {
+    refreshPlaylists()
+  }, [refreshPlaylists])
+
+  useEffect(() => {
     if (video && !viewTracked.current) {
       viewTracked.current = true
-      videoAPI.incrementViews(videoId).catch(() => {})
+      videoAPI.incrementViews(videoId).catch(() => { })
     }
   }, [video, videoId])
 
@@ -110,6 +116,29 @@ export const VideoPlayer = () => {
     }
   }
 
+  const handleCreateAndSave = async () => {
+    if (!newPlaylistName.trim()) return
+    setCreatingPlaylist(true)
+    try {
+      const res = await playlistAPI.createPlaylist({ name: newPlaylistName.trim(), description: '' })
+      const newPlaylist = res.data.data
+      await playlistAPI.addVideoToPlaylist(newPlaylist._id, videoId)
+      addNotification('Created and added to playlist!', 'success')
+      setNewPlaylistName('')
+      setShowPlaylistMenu(false)
+      refreshPlaylists()
+    } catch {
+      addNotification('Failed to create playlist', 'error')
+    } finally {
+      setCreatingPlaylist(false)
+    }
+  }
+
+  const handleRefreshPlaylists = () => {
+    refreshPlaylists()
+    addNotification('Playlists refreshed', 'info')
+  }
+
   const handleDeleteVideo = useCallback(async () => {
     if (!window.confirm('Are you sure you want to delete this video?')) return
     try {
@@ -164,6 +193,7 @@ export const VideoPlayer = () => {
                     <ThumbsDown className={`w-4 h-4 ${isDisliked ? 'fill-accent' : ''}`} />
                   </button>
                 </div>
+                {/* on lcick it should copy the video id   */}
                 <button className="flex items-center gap-1.5 px-4 py-2 bg-tertiary rounded-full text-sm font-medium text-text-secondary hover:bg-elevated transition-colors">
                   <Share2 className="w-4 h-4" />
                   <span className="hidden sm:inline">Share</span>
@@ -175,22 +205,43 @@ export const VideoPlayer = () => {
                       <span className="hidden sm:inline">Save</span>
                     </button>
                     {showPlaylistMenu && (
-                      <div className="absolute right-0 top-full mt-2 w-56 bg-secondary border border-border-subtle rounded-xl shadow-dropdown z-50 py-2 max-h-64 overflow-y-auto">
-                        <p className="px-4 py-2 text-xs font-semibold text-text-tertiary uppercase tracking-wider">Save to playlist</p>
-                        {playlists.length > 0 ? playlists.map(p => (
+                      <div className="absolute right-0 top-full mt-2 w-64 bg-secondary border border-border-subtle rounded-xl shadow-dropdown z-50 py-2">
+                        <div className="flex items-center justify-between px-4 py-2">
+                          <p className="text-xs font-semibold text-text-tertiary uppercase tracking-wider">Save to playlist</p>
+                          <button onClick={handleRefreshPlaylists} className="text-xs text-accent hover:text-accent-hover transition-colors">Refresh</button>
+                        </div>
+                        <div className="max-h-48 overflow-y-auto">
+                          {playlists.length > 0 ? playlists.map(p => (
+                            <button
+                              key={p._id}
+                              onClick={() => handleSaveToPlaylist(p._id)}
+                              disabled={savingToPlaylist === p._id}
+                              className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-text-primary hover:bg-tertiary transition-colors disabled:opacity-50"
+                            >
+                              <ListMusic className="w-4 h-4 text-accent shrink-0" />
+                              <span className="truncate">{p.name}</span>
+                              {savingToPlaylist === p._id && <Check className="w-4 h-4 text-state-success ml-auto shrink-0" />}
+                            </button>
+                          )) : (
+                            <p className="px-4 py-2 text-sm text-text-tertiary text-center">No playlists yet</p>
+                          )}
+                        </div>
+                        <div className="border-t border-border-subtle mt-2 pt-2 px-4">
+                          <input
+                            type="text"
+                            value={newPlaylistName}
+                            onChange={(e) => setNewPlaylistName(e.target.value)}
+                            placeholder="New playlist name..."
+                            className="w-full bg-tertiary border border-border-subtle rounded-lg px-3 py-1.5 text-sm text-text-primary placeholder-text-tertiary/60 focus:outline-none focus:border-accent transition-colors mb-2"
+                          />
                           <button
-                            key={p._id}
-                            onClick={() => handleSaveToPlaylist(p._id)}
-                            disabled={savingToPlaylist === p._id}
-                            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-text-primary hover:bg-tertiary transition-colors disabled:opacity-50"
+                            onClick={handleCreateAndSave}
+                            disabled={!newPlaylistName.trim() || creatingPlaylist}
+                            className="w-full py-1.5 bg-accent text-white rounded-lg text-sm font-medium hover:bg-accent-hover transition-colors disabled:opacity-50"
                           >
-                            <ListMusic className="w-4 h-4 text-accent" />
-                            <span className="truncate">{p.name}</span>
-                            {savingToPlaylist === p._id && <Check className="w-4 h-4 text-state-success ml-auto" />}
+                            {creatingPlaylist ? 'Creating...' : 'Create & Add'}
                           </button>
-                        )) : (
-                          <p className="px-4 py-2 text-sm text-text-tertiary">No playlists yet</p>
-                        )}
+                        </div>
                       </div>
                     )}
                   </div>
@@ -219,10 +270,16 @@ export const VideoPlayer = () => {
             </div>
             <div className="flex items-center gap-2">
               {user?._id === video.owner?._id && (
-                <button onClick={handleDeleteVideo} className="flex items-center gap-1.5 px-3 py-1.5 bg-red-500/10 text-red-400 rounded-lg text-sm font-medium hover:bg-red-500/20 transition-colors">
-                  <Trash2 className="w-4 h-4" />
-                  Delete
-                </button>
+                <>
+                  <Link to={`/video/edit/${video._id}`} className="flex items-center gap-1.5 px-3 py-1.5 bg-tertiary text-text-secondary rounded-lg text-sm font-medium hover:bg-elevated transition-colors">
+                    <Pencil className="w-4 h-4" />
+                    Edit
+                  </Link>
+                  <button onClick={handleDeleteVideo} className="flex items-center gap-1.5 px-3 py-1.5 bg-red-500/10 text-red-400 rounded-lg text-sm font-medium hover:bg-red-500/20 transition-colors">
+                    <Trash2 className="w-4 h-4" />
+                    Delete
+                  </button>
+                </>
               )}
               <Button size="sm" onClick={handleSubscribe}>
                 {isSubscribed ? 'Subscribed' : 'Subscribe'}

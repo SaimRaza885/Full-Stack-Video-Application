@@ -9,10 +9,13 @@ export const videoAPI = {
     onUploadProgress: onProgress,
     timeout: 600000,
   }),
-  updateVideo: (id, data) => api.patch(`/videos/${id}`, data),
+  updateVideo: (id, formData) => api.patch(`/videos/${id}`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  }),
   deleteVideo: (id) => api.delete(`/videos/${id}`),
-  getVideosByUser: (userId) => api.get('/videos/', { params: { userId } }),
+  getVideosByUser: (userId, params = {}) => api.get('/videos/', { params: { userId, ...params } }),
   incrementViews: (videoId) => api.patch(`/videos/views/${videoId}`),
+  togglePublishStatus: (videoId, status) => api.patch(`/videos/toggle/publish/${videoId}`, status),
 }
 
 // Comment APIs

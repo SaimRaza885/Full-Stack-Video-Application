@@ -123,12 +123,12 @@ const loginUser = asyncHandler(async (req, res) => {
   // access and resfresh token
   // send cookie
 
-  const { username, email, password} = req.body;
+  const { username, email, password } = req.body;
   // console.log("Request body:", req.body);
-  
+
   if (!email && !username) {
     throw new ApiError(404, "Email or Username is requreid");
-  } 
+  }
 
   const user = await User.findOne({
     $or: [{ username }, { email }],
@@ -419,6 +419,7 @@ const GetUserChannelProfile = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Username not Found");
   }
 
+
   const channel = await User.aggregate([
     {
       $match: {
@@ -451,7 +452,7 @@ const GetUserChannelProfile = asyncHandler(async (req, res) => {
         },
         isSubscribe: req.user?._id ? {
           $cond: {
-            if:{$in:[req.user._id ,"$subscribers.subscriber"]},
+            if: { $in: [req.user._id, "$subscribers.subscriber"] },
             then: true,
             else: false,
           },
@@ -464,7 +465,6 @@ const GetUserChannelProfile = asyncHandler(async (req, res) => {
         username: 1,
         coverImage: 1,
         fullName: 1,
-        email: 1,
         avatar: 1,
         subscriberCount: 1,
         channelSubscribeToCount: 1,
@@ -477,6 +477,7 @@ const GetUserChannelProfile = asyncHandler(async (req, res) => {
     /* Check and make it > 0 */
     throw new ApiError(400, "Chanel does not exist");
   }
+  console.log(channel[0])
   return res
     .status(200)
     .json(
@@ -530,6 +531,8 @@ const GetUserHistory = asyncHandler(async (req, res) => {
     },
   ]);
 
+
+  console.log(user[0].WatchHistory)
   return res
     .status(200)
     .json(

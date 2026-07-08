@@ -9,22 +9,21 @@ import {
     updatePlaylist,
 } from "../controllers/playlist.controllers.js"
 import VerifyJWT from "../middleware/auth.middleware.js"
+import optionalAuth from "../middleware/optionalAuth.middleware.js"
 
 const router = Router();
 
-router.use(VerifyJWT); // Apply verifyJWT middleware to all routes in this file
+router.route("/user/:userId").get(getUserPlaylists);
 
-router.route("/").post(createPlaylist)
+router.route("/").post(VerifyJWT, createPlaylist)
 
 router
     .route("/:playlistId")
-    .get(getPlaylistById)
-    .patch(updatePlaylist)
-    .delete(deletePlaylist);
+    .get(optionalAuth, getPlaylistById)
+    .patch(VerifyJWT, updatePlaylist)
+    .delete(VerifyJWT, deletePlaylist);
 
-router.route("/add/:videoId/:playlistId").patch(addVideoToPlaylist);
-router.route("/remove/:videoId/:playlistId").patch(removeVideoFromPlaylist);
-
-router.route("/user/:userId").get(getUserPlaylists);
+router.route("/add/:videoId/:playlistId").patch(VerifyJWT, addVideoToPlaylist);
+router.route("/remove/:videoId/:playlistId").patch(VerifyJWT, removeVideoFromPlaylist);
 
 export default router

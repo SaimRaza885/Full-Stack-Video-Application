@@ -3,7 +3,6 @@ import { AuthProvider } from './context/AuthContext'
 import { VideoProvider } from './context/VideoContext'
 import { UIProvider } from './context/UIContext'
 import { Navbar, Sidebar, ToastContainer } from './components'
-import { UploadModal } from './components/ui/UploadModal'
 import { UploadProgressBar } from './components/ui/UploadProgressBar'
 import { VideoPreviewModal } from './components/ui/VideoPreviewModal'
 import { ErrorBoundary } from './components/common/ErrorBoundary'
@@ -20,6 +19,7 @@ import {
   History,
   Subscriptions,
 } from './pages'
+import EditVideo from './pages/EditVideo'
 
 const PageLayout = ({ children }) => {
   return (
@@ -43,10 +43,10 @@ function AppContent() {
       <Route path="/register" element={<Register />} />
       <Route path="/" element={<PageLayout><Home /></PageLayout>} />
       <Route path="/video/:videoId" element={<PageLayout><VideoPlayer /></PageLayout>} />
+      <Route path="/video/edit/:videoId" element={<PageLayout><EditVideo /></PageLayout>} />
       <Route path="/channel/:username" element={<PageLayout><Channel /></PageLayout>} />
       <Route path="/search" element={<PageLayout><Search /></PageLayout>} />
       <Route path="/upload" element={<PageLayout><Upload /></PageLayout>} />
-      <Route path="/trending" element={<PageLayout><Home /></PageLayout>} />
       <Route path="/playlists" element={<PageLayout><Playlists /></PageLayout>} />
       <Route path="/profile" element={<PageLayout><Profile /></PageLayout>} />
       <Route path="/subscriptions" element={<PageLayout><Subscriptions /></PageLayout>} />
@@ -63,7 +63,7 @@ function App() {
         <VideoProvider>
           <UIProvider>
             <AppContent />
-            <UploadModal />
+
             <VideoPreviewModal />
             <ToastContainer />
           </UIProvider>

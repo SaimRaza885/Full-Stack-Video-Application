@@ -17,6 +17,7 @@ const videoSchema = new mongoose.Schema(
       },
       default: { url: '', public_id: '' },
     },
+
     title: {
       type: String,
       required: true,

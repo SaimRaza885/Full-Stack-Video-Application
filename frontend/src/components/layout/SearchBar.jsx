@@ -16,7 +16,7 @@ export const SearchBar = ({ initialQuery = '' }) => {
 
   return (
     <form onSubmit={handleSubmit} className="hidden md:flex items-center flex-1 max-w-xl mx-4 lg:mx-8">
-      <div className={`relative w-full transition-all duration-200 ${focused ? 'scale-[1.02]' : ''}`}>
+      <div className={`relative w-full transition-all duration-200 rounded-full ${focused ? 'scale-[1.02]' : ''}`}>
         <input
           type="text"
           value={query}
@@ -24,7 +24,7 @@ export const SearchBar = ({ initialQuery = '' }) => {
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
           placeholder="Search"
-          className="w-full bg-tertiary border rounded-l-full rounded-r-none px-4 py-2 text-sm text-text-primary placeholder-text-tertiary/60 focus:outline-none transition-all"
+          className="w-full bg-tertiary border rounded-full  px-4 py-2 text-sm text-text-primary placeholder-text-tertiary/60 focus:outline-none transition-all"
           style={{ borderColor: focused ? '#8B5CF6' : '#2A2A42', borderRight: 'none' }}
         />
         <button

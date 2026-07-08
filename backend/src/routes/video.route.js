@@ -9,13 +9,14 @@ import {
     updateVideo,
 } from "../controllers/video.controllers.js"
 import VerifyJWT from "../middleware/auth.middleware.js"
-import {upload} from "../middleware/multer.middleware.js"
+import optionalAuth from "../middleware/optionalAuth.middleware.js"
+import { upload } from "../middleware/multer.middleware.js"
 
 const router = Router();
 
 router
     .route("/")
-    .get(getAllVideos)
+    .get(optionalAuth, getAllVideos)
     .post(
         VerifyJWT,
         upload.fields([
@@ -27,14 +28,14 @@ router
                 name: "thumbnail",
                 maxCount: 1,
             },
-            
+
         ]),
         publishAVideo
     );
 
 router
     .route("/:videoId")
-    .get(getVideoById)
+    .get(optionalAuth, getVideoById)
     .delete(VerifyJWT, deleteVideo)
     .patch(VerifyJWT, upload.single("thumbnail"), updateVideo);
 

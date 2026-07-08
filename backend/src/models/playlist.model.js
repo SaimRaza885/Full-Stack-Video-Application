@@ -6,7 +6,10 @@ const playlistSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    description: { type: String, required: true },
+    description: {
+      type: String,
+      required: true
+    },
     video: [
       {
         type: mongoose.Schema.Types.ObjectId,

@@ -36,7 +36,7 @@ export const VideoCard = ({ video, horizontal = false }) => {
   }
 
   return (
-    <div onClick={handleClick} className="group block cursor-pointer">
+    <div onClick={handleClick} className="group block cursor-pointer border border-gray-900 p-4 ">
       <div className="relative w-full aspect-video bg-[#1C1C2E] rounded-xl overflow-hidden mb-3">
         <img src={thumb} alt={video.title} loading="lazy" className="w-full h-full object-cover" />
         <DurationBadge seconds={video.duration} />

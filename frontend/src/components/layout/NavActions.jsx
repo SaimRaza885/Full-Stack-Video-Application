@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { Search, Bell, Plus } from 'lucide-react'
+import { Search, Plus } from 'lucide-react'
 import { useUI } from '../../context/UIContext'
 import { useAuth } from '../../context/AuthContext'
 import { UserDropdown } from './UserDropdown'
@@ -20,13 +20,12 @@ export const NavActions = () => {
             className="flex items-center gap-1.5 text-text-secondary hover:text-white px-3 py-1.5 hover:bg-tertiary rounded-full transition-colors text-sm font-medium border border-border-subtle"
             title="Create"
           >
-            <Plus className="w-4 h-4" />
-            <span className="hidden sm:inline">Create</span>
+            <Link to="/upload" className='flex items-center'>
+              <Plus className="w-4 h-4" />
+              <span className="hidden sm:inline">Create</span>
+            </Link>
           </button>
-          <button className="text-text-tertiary hover:text-text-primary p-2 hover:bg-tertiary rounded-full transition-colors relative" title="Notifications">
-            <Bell className="w-5 h-5" />
-            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-[#FF0000] rounded-full ring-2 ring-primary" />
-          </button>
+
           <UserDropdown user={user} onLogout={logout} />
         </>
       ) : (

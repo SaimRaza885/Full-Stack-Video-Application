@@ -24,6 +24,15 @@ const getAllVideos = asyncHandler(async (req, res) => {
 
   const pipeline = [];
 
+  const isOwner = userId && req.user?._id && userId === req.user?._id.toString()
+  if (!isOwner) {
+    pipeline.push({
+      $match: {
+        isPublished: true,
+      },
+    });
+  }
+
   if (query) {
     pipeline.push({
       $match: {
@@ -44,6 +53,7 @@ const getAllVideos = asyncHandler(async (req, res) => {
       },
     });
   }
+
 
   // Sorting
   //sortType can be ascending(-1) or descending(1)
@@ -95,7 +105,7 @@ const getAllVideos = asyncHandler(async (req, res) => {
 });
 
 const publishAVideo = asyncHandler(async (req, res) => {
-  const { title, description } = req.body;
+  const { title, description, isPublished } = req.body;
 
   // TODO: get video, upload to cloudinary, create video
   if (!title || !description) {
@@ -134,7 +144,7 @@ const publishAVideo = asyncHandler(async (req, res) => {
     description,
     duration: video?.duration,
     owner: req.user?._id,
-    isPublished: true,
+    isPublished,
   });
 
   if (!videoInDataBase) {
@@ -284,6 +294,7 @@ const getVideoById = asyncHandler(async (req, res) => {
         like_Count: 1,
         isLiked: 1,
         All_Comments: 1,
+        isPublished: 1,
       },
     },
   ]);
@@ -298,6 +309,7 @@ const getVideoById = asyncHandler(async (req, res) => {
     });
   }
 
+  console.log(fetched_Video[0])
   return res
     .status(200)
     .json(new ApiResponse(200, fetched_Video[0], "Successfully fetched video"));
@@ -425,6 +437,8 @@ const incrementViews = asyncHandler(async (req, res) => {
     .status(200)
     .json(new ApiResponse(200, {}, "View count incremented"));
 });
+
+
 
 export {
   getAllVideos,

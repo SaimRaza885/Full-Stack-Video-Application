@@ -14,7 +14,7 @@ const createPlaylist = asyncHandler(async (req, res) => {
   }
 
   if (!description) {
-    throw new ApiError(400, "PlayList Descrition is requried");
+    description = "";
   }
 
   const playlist = await PlayList.create({
@@ -117,17 +117,6 @@ const getPlaylistById = asyncHandler(async (req, res) => {
         localField: "video",
         foreignField: "_id",
         as: "Videos",
-      },
-    },
-    {
-      $addFields: {
-        Videos: {
-          $filter: {
-            input: "$Videos",
-            as: "video",
-            cond: { $eq: ["$$video.isPublished", true] },
-          },
-        },
       },
     },
     {
@@ -287,7 +276,7 @@ const deletePlaylist = asyncHandler(async (req, res) => {
     throw new ApiError(404, "Playlist not found");
   }
 
-  if (playlist.owner.toString() !== req.user?._id.toString()) {
+  if (playlist.owner?.toString() !== req.user?._id.toString()) {
     throw new ApiError(403, "Only the owner can delete this playlist");
   }
 
@@ -315,7 +304,7 @@ const updatePlaylist = asyncHandler(async (req, res) => {
     throw new ApiError(404, "Playlist not found");
   }
 
-  if (playlist.owner.toString() !== req.user?._id.toString()) {
+  if (playlist.owner?.toString() !== req.user?._id.toString()) {
     throw new ApiError(403, "Only the owner can update the playlist");
   }
 
