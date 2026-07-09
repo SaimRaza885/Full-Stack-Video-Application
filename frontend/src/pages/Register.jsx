@@ -13,7 +13,7 @@ export const Register = () => {
     password: '',
     confirmPassword: '',
     avatar: null,
-    coverImage: null, // Good practice to declare this explicitly
+    coverImage: null,
   })
   const [avatarPreview, setAvatarPreview] = useState(null)
   const [coverImagePreview, setCoverImagePreview] = useState(null) // Fixed typo here

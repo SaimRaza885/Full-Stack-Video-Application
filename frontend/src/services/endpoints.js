@@ -61,6 +61,16 @@ export const dashboardAPI = {
 // User API
 export const userAPI = {
   getHistory: () => api.get('/users/history'),
+  changeAvatar: (data) => api.patch('/users/change-avatar', data,
+    {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    }),
+  changeCoverImage: (data) => api.patch('/users/change-cover-image', data,
+    {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    }),
+
+
 }
 
 // Search API
