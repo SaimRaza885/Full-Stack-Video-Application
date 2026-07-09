@@ -35,37 +35,12 @@ const getVideoComments = asyncHandler(async (req, res) => {
         as: "OwnerDetails",
       },
     },
-    {
-      $lookup: {
-        from: "likes",
-        foreignField: "comment",
-        localField: "_id",
-        as: "likes",
-      },
-    },
+
     {
       $addFields: {
-        likeCount: { $size: "$likes" },
+
         owner: { $first: "$OwnerDetails" },
-        isliked: req.user?._id ? {
-          $cond: {
-            if: {
-              $in: [
-                req.user._id,
-                {
-                  $map: {
-                    input: "$likes",
-                    as: "like",
-                    in: "$$like.likedBy",
-                  },
-                },
-              ],
-            },
-            then: true,
-            else: false,
-          },
-        } : false,
-      },
+      }
     },
     {
       $sort: {
@@ -75,9 +50,8 @@ const getVideoComments = asyncHandler(async (req, res) => {
     {
       $project: {
         content: 1,
-        likeCount: 1,
-        isliked: 1,
         owner: {
+          _id: 1,
           username: 1,
           fullName: 1,
           avatar: 1,

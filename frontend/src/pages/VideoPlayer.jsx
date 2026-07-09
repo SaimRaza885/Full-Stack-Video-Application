@@ -32,6 +32,44 @@ export const VideoPlayer = () => {
   const [newPlaylistName, setNewPlaylistName] = useState('')
   const [creatingPlaylist, setCreatingPlaylist] = useState(false)
 
+
+  // Comment Editing States
+  const [editingCommentId, setEditingCommentId] = useState(null)
+  const [editCommentContent, setEditCommentContent] = useState('')
+  const [actionLoadingId, setActionLoadingId] = useState(null)
+
+  const handleUpdateComment = async (commentId) => {
+    if (!editCommentContent.trim()) return
+    try {
+      setActionLoadingId(commentId)
+      await commentAPI.updateComment(commentId, { content: editCommentContent.trim() })
+
+      setComments(prev => prev.map(c => c._id === commentId ? { ...c, content: editCommentContent.trim() } : c))
+      setEditingCommentId(null)
+      setEditCommentContent('')
+      addNotification('Comment updated successfully', 'success')
+    } catch {
+      addNotification('Failed to update comment', 'error')
+    } finally {
+      setActionLoadingId(null)
+    }
+  }
+
+  const handleDeleteComment = async (commentId) => {
+    if (!window.confirm('Delete this comment permanently?')) return
+    try {
+      setActionLoadingId(commentId)
+      await commentAPI.deleteComment(commentId)
+
+      setComments(prev => prev.filter(c => c._id !== commentId))
+      addNotification('Comment deleted successfully', 'success')
+    } catch {
+      addNotification('Failed to delete comment', 'error')
+    } finally {
+      setActionLoadingId(null)
+    }
+  }
+
   const viewTracked = useRef(false)
 
   const refreshPlaylists = useCallback(() => {
@@ -169,7 +207,7 @@ export const VideoPlayer = () => {
 
   const owner = video.owner || {}
   const ownerUsername = owner.username || 'Unknown'
-  const ownerAvatar = owner.avatar || null
+  const ownerAvatar = owner.avatar.url || null
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-6">
@@ -184,7 +222,7 @@ export const VideoPlayer = () => {
             <div className="flex items-center justify-between flex-wrap gap-3 mt-2">
               <p className="text-sm text-text-tertiary">{fmt(video.views)} views &bull; {ago(video.createdAt)}</p>
               <div className="flex items-center gap-2">
-                <div className="flex items-center bg-tertiary rounded-full overflow-hidden">
+                <div className="flex items-center bg-tertiary rounded-full overJflow-hidden">
                   <button onClick={handleLike} className={`flex items-center gap-1.5 px-4 py-2 text-sm font-medium transition-colors hover:bg-elevated border-r border-border-subtle ${isLiked ? 'text-accent' : 'text-text-secondary'}`}>
                     <ThumbsUp className={`w-4 h-4 ${isLiked ? 'fill-accent' : ''}`} />
                     {likeCount > 0 && <span>{fmt(likeCount)}</span>}
@@ -292,7 +330,7 @@ export const VideoPlayer = () => {
               <p className="text-sm text-text-primary whitespace-pre-wrap">{video.description}</p>
             </div>
           )}
-
+          {/* ---------------------------- comment section -----------------------------  */}
           <div>
             <h2 className="text-lg font-bold text-text-primary mb-4">Comments ({comments.length})</h2>
             <form onSubmit={handleAddComment} className="flex gap-3 mb-6">
@@ -305,24 +343,91 @@ export const VideoPlayer = () => {
             </form>
             <div className="space-y-4">
               {comments.length > 0 ? comments.map((comment, idx) => {
+                // FIX: Unify owner retrieval safely from either potential key
                 const cOwner = comment.comment_owner || comment.owner || {}
+
+                // FIX: Explicitly target the ID wherever it lives in the payload
+                const commentOwnerId = cOwner._id || comment.owner?._id || comment.owner;
+                const isCommentOwner = user?._id && String(user._id) === String(commentOwnerId);
+
+
+                console.log(comments[0])
+
                 const cAvatar = cOwner.avatar || null
+
                 return (
-                  <div key={comment._id || idx} className="flex gap-3">
-                    {cAvatar ? (
-                      <img src={cAvatar} alt="" className="w-8 h-8 rounded-full object-cover ring-1 ring-border-subtle shrink-0" />
+                  <div key={comment._id || idx} className="flex gap-3 items-start bg-secondary/30 p-3 rounded-xl border border-border-subtle/20 transition-all">
+                    {cAvatar?.url ? (
+                      <img src={cAvatar.url} alt="" className="w-8 h-8 rounded-full object-cover ring-1 ring-border-subtle shrink-0" />
                     ) : (
                       <div className="w-8 h-8 rounded-full bg-tertiary flex items-center justify-center shrink-0">
                         <User className="w-4 h-4 text-text-tertiary" />
                       </div>
                     )}
-                    <div className="min-w-0">
+
+                    <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-0.5">
                         <span className="text-sm font-medium text-text-primary">@{cOwner.username || 'unknown'}</span>
                         <span className="text-xs text-text-tertiary">{ago(comment.createdAt)}</span>
                       </div>
-                      <p className="text-sm text-text-primary/90 leading-relaxed">{comment.content}</p>
+
+                      {editingCommentId === comment._id ? (
+                        <div className="mt-2 space-y-2">
+                          <input
+                            type="text"
+                            value={editCommentContent}
+                            onChange={(e) => setEditCommentContent(e.target.value)}
+                            className="w-full bg-tertiary border border-border-subtle rounded-lg px-3 py-1.5 text-sm text-text-primary focus:outline-none focus:border-accent"
+                            disabled={actionLoadingId === comment._id}
+                            autoFocus
+                          />
+                          <div className="flex gap-2">
+                            <Button
+                              size="xs"
+                              onClick={() => handleUpdateComment(comment._id)}
+                              disabled={!editCommentContent.trim() || actionLoadingId === comment._id}
+                            >
+                              Save
+                            </Button>
+                            <Button
+                              size="xs"
+                              variant="secondary"
+                              onClick={() => setEditingCommentId(null)}
+                              disabled={actionLoadingId === comment._id}
+                            >
+                              Cancel
+                            </Button>
+                          </div>
+                        </div>
+                      ) : (
+                        <p className="text-sm text-text-primary/90 leading-relaxed break-words">{comment.content}</p>
+                      )}
                     </div>
+
+                    {/* Action panel triggers cleanly now that IDs match string targets */}
+                    {isCommentOwner && editingCommentId !== comment._id && (
+                      <div className="flex items-center gap-2 ml-auto shrink-0 self-center">
+                        <button
+                          onClick={() => {
+                            setEditingCommentId(comment._id)
+                            setEditCommentContent(comment.content)
+                          }}
+                          disabled={actionLoadingId !== null}
+                          className="p-2 bg-tertiary/60 hover:bg-accent/20 text-accent rounded-lg transition-all hover:scale-105 active:scale-95 disabled:opacity-40"
+                          title="Edit comment"
+                        >
+                          <Pencil className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          onClick={() => handleDeleteComment(comment._id)}
+                          disabled={actionLoadingId !== null}
+                          className="p-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-lg transition-all hover:scale-105 active:scale-95 disabled:opacity-40"
+                          title="Delete comment"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    )}
                   </div>
                 )
               }) : (
