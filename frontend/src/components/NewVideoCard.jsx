@@ -22,9 +22,8 @@ export const NewVideoCard = ({ video, ch = "", horizontal = false }) => {
     }
     const channel = ownerDetails || owner || {}
 
-
     const {
-        username = "",
+        username,
         fullName = "Unknown Channel",
         avatar,
     } = channel
@@ -56,19 +55,24 @@ export const NewVideoCard = ({ video, ch = "", horizontal = false }) => {
                     <DurationBadge seconds={duration} />
                 </div>
 
+
                 {/* Content */}
                 <div className="flex min-w-0 flex-1 flex-col">
                     <h4 className="line-clamp-2 text-sm font-semibold leading-5 text-text-primary transition-colors group-hover:text-accent">
                         {title || "Untitled Video"}
                     </h4>
 
-                    <Link
-                        to={`/channel/${username}`}
-                        onClick={(e) => e.stopPropagation()}
-                        className="mt-1 w-fit text-xs text-text-secondary transition-colors hover:text-text-primary"
-                    >
-                        {fullName}
-                    </Link>
+                    <div className="flex ">
+
+
+                        <Link
+                            to={`/channel/${username}`}
+                            onClick={(e) => e.stopPropagation()}
+                            className="mt-1 w-fit text-xs text-text-secondary transition-colors hover:text-text-primary"
+                        >
+                            {username}
+                        </Link>
+                    </div>
 
                     <p className="mt-1 text-xs text-text-tertiary">
                         {fmt(views)} views • {ago(createdAt)}
@@ -92,6 +96,7 @@ export const NewVideoCard = ({ video, ch = "", horizontal = false }) => {
                     <DurationBadge seconds={duration} />
                 </div>
             </Link>
+
 
             {/* Video Info */}
             <div className="mt-3 flex gap-3">

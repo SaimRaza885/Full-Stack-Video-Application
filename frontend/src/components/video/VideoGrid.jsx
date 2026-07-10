@@ -1,5 +1,4 @@
 import { NewVideoCard } from '../NewVideoCard'
-import { VideoCard } from './VideoCard'
 import { VideoCardSkeleton } from './VideoCardSkeleton'
 
 export const VideoGrid = ({ videos, loading, error, emptyMessage = 'No videos found', emptyIcon, onRetry, horizontal = false }) => {

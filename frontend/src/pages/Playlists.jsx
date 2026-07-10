@@ -145,7 +145,7 @@ export const Playlists = () => {
     try {
       const res = await videoAPI.getVideosByUser(user._id, { page, limit: 12 })
       const data = res.data.data
-      console.log(data)
+
       const newVideos = data.docs || []
       if (page === 1) {
         setUserVideos(newVideos)
