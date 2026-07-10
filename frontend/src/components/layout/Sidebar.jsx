@@ -1,4 +1,4 @@
-import { Home, Video, Library, History } from 'lucide-react'
+import { Home, Video, Library, History, Heart } from 'lucide-react'
 import { useUI } from '../../context/UIContext'
 import { SidebarItem } from './SidebarItem'
 
@@ -6,6 +6,7 @@ const mainLinks = [
   { label: 'Home', to: '/', icon: Home },
   { label: 'Subscriptions', to: '/subscriptions', icon: Video },
   { label: 'Library', to: '/playlists', icon: Library },
+  { label: 'Liked', to: '/liked-vidoes', icon: Heart },
   { label: 'History', to: '/history', icon: History },
 ]
 

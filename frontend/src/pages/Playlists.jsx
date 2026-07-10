@@ -40,6 +40,7 @@ export const Playlists = () => {
         setError(null)
         const response = await playlistAPI.getUserPlaylists(user._id)
         setPlaylists(response.data.data || [])
+
       } catch (err) {
         setError('Failed to load playlists')
       } finally {
@@ -144,6 +145,7 @@ export const Playlists = () => {
     try {
       const res = await videoAPI.getVideosByUser(user._id, { page, limit: 12 })
       const data = res.data.data
+      console.log(data)
       const newVideos = data.docs || []
       if (page === 1) {
         setUserVideos(newVideos)
@@ -284,11 +286,10 @@ export const Playlists = () => {
                             key={video._id}
                             onClick={() => !alreadyInPlaylist && handleSelectUserVideo(video._id)}
                             disabled={alreadyInPlaylist || addingUserVideo === video._id}
-                            className={`relative group text-left rounded-lg overflow-hidden border transition-all ${
-                              alreadyInPlaylist
-                                ? 'border-state-success/30 opacity-60 cursor-not-allowed'
-                                : 'border-border-subtle hover:border-accent/30 hover:shadow-card-hover'
-                            }`}
+                            className={`relative group text-left rounded-lg overflow-hidden border transition-all ${alreadyInPlaylist
+                              ? 'border-state-success/30 opacity-60 cursor-not-allowed'
+                              : 'border-border-subtle hover:border-accent/30 hover:shadow-card-hover'
+                              }`}
                           >
                             <div className="w-full aspect-video bg-tertiary overflow-hidden">
                               <img

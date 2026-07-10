@@ -22,6 +22,9 @@ export const Channel = () => {
   const [selectedPlaylist, setSelectedPlaylist] = useState(null)
   const [playlistVideos, setPlaylistVideos] = useState([])
   const [loadingPlaylistVideos, setLoadingPlaylistVideos] = useState(false)
+  const [IsChannelOwner, setIsChannelOwner] = useState(false)
+
+
 
 
   useEffect(() => {
@@ -33,6 +36,9 @@ export const Channel = () => {
         const channelData = channelRes.data.data
         setChannel(channelData)
         setIsSubscribed(channelData.isSubscribe || false)
+        if (channelData._id === currentUser._id) {
+          setIsChannelOwner(true)
+        }
 
 
         const [videosRes, playlistsRes] = await Promise.allSettled([
@@ -92,13 +98,13 @@ export const Channel = () => {
   if (error) return <div className="container-custom py-8"><ErrorState message={error} onRetry={() => window.location.reload()} /></div>
   if (!channel) return <div className="container-custom py-8 text-center text-text-secondary">Channel not found</div>
 
-  const avatarUrl = channel.avatar || null
+  const avatarUrl = channel?.avatar?.url || null
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-6">
       <div className="w-full h-40 bg-gradient-to-r from-accent to-accent-hover rounded-xl mb-6 relative" >
         {channel?.coverImage &&
-          <img src={channel?.coverImage} alt="" className='w-full h-full object-cover ' />
+          <img src={channel?.coverImage?.url} alt="" className='w-full h-full object-cover ' />
 
         }
 
@@ -126,9 +132,24 @@ export const Channel = () => {
             </p>
           </div>
         </div>
-        <Button onClick={handleSubscribe} variant={isSubscribed ? 'secondary' : 'primary'}>
-          {isSubscribed ? 'Subscribed' : 'Subscribe'}
-        </Button>
+        {!IsChannelOwner ? (
+
+          <Button onClick={handleSubscribe} variant={isSubscribed ? 'secondary' : 'primary opacity-90'}>
+            {isSubscribed ? 'Subscribed' : 'Subscribe'}
+          </Button>
+        )
+
+
+          :
+          (
+
+            <div className='flex items-center gap-2'>
+              <Button onClick={() => navigate('/upload')} variant='primary'>
+                Upload Video
+              </Button>
+            </div>
+          )
+        }
       </div>
 
       <div className="flex gap-6 border-b border-border-subtle mb-6">

@@ -32,7 +32,11 @@ export const AuthProvider = ({ children }) => {
     setLoading(true)
     setError(null)
     try {
-      const response = await api.post('/users/register', formData)
+      const response = await api.post('/users/register', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      })
       const { accessToken: newToken, user: userData } = response.data.data
       localStorage.setItem('token', newToken)
       setToken(newToken)
@@ -88,6 +92,7 @@ export const AuthProvider = ({ children }) => {
 
   const value = {
     user,
+    setUser,
     loading,
     error,
     token,

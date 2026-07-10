@@ -2,9 +2,10 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { userAPI } from '../services/endpoints'
 import { useAuth } from '../context/AuthContext'
-import { Skeleton, EmptyState, ErrorState } from '../components'
+import { Skeleton, EmptyState, ErrorState, VideoCard } from '../components'
 import { History as HistoryIcon } from 'lucide-react'
 import { fmt, ago } from '../utils'
+import { NewVideoCard } from '../components/NewVideoCard'
 
 export const History = () => {
   const { user } = useAuth()
@@ -43,24 +44,8 @@ export const History = () => {
       {videos.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {videos.map((video) => {
-            const owner = video.owner || {}
             return (
-              <Link key={video._id} to={`/video/${video._id}`} className="group">
-                <div className="bg-secondary border border-border-subtle rounded-xl overflow-hidden transition-all duration-200 hover:border-accent/30 hover:shadow-card-hover">
-                  <div className="relative w-full aspect-video bg-tertiary overflow-hidden">
-                    <img
-                      src={video.thumbnail?.url || 'https://placehold.co/320x180/1C1C2E/6B6B80?text=No+Thumbnail'}
-                      alt={video.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                  </div>
-                  <div className="p-3">
-                    <h3 className="font-semibold text-text-primary text-sm line-clamp-2">{video.title}</h3>
-                    <p className="text-text-secondary text-xs mt-1 truncate">{owner.username || 'Unknown'}</p>
-                    <p className="text-text-tertiary text-xs">{fmt(video.views)} views &bull; {ago(video.createdAt)}</p>
-                  </div>
-                </div>
-              </Link>
+              <NewVideoCard video={video} key={video._id} />
             )
           })}
         </div>

@@ -29,7 +29,6 @@ export const commentAPI = {
 // Like APIs
 export const likeAPI = {
   likeVideo: (videoId) => api.post(`/likes/toggle/v/${videoId}`),
-  likeComment: (commentId) => api.post(`/likes/toggle/c/${commentId}`),
   getLikedVideos: () => api.get('/likes/videos'),
 }
 

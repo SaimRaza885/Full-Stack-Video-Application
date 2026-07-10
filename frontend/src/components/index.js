@@ -1,5 +1,5 @@
 // UI primitives
-export { Button, Avatar, Badge, Card, Input, Textarea, Modal, Skeleton, Spinner, Toast, ToastContainer, VideoPreviewModal } from './ui/index'
+export { Button, Avatar, Badge, Card, Input, Textarea, Modal, Skeleton, Spinner, Toast, ToastContainer } from './ui/index'
 
 // Layout
 export { Navbar, Sidebar, SearchBar, NavActions, UserDropdown, SidebarItem } from './layout/index'

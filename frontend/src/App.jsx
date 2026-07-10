@@ -4,7 +4,6 @@ import { VideoProvider } from './context/VideoContext'
 import { UIProvider } from './context/UIContext'
 import { Navbar, Sidebar, ToastContainer } from './components'
 import { UploadProgressBar } from './components/ui/UploadProgressBar'
-import { VideoPreviewModal } from './components/ui/VideoPreviewModal'
 import { ErrorBoundary } from './components/common/ErrorBoundary'
 import {
   Login,
@@ -20,6 +19,7 @@ import {
   Subscriptions,
 } from './pages'
 import EditVideo from './pages/EditVideo'
+import { Liked_Vidoes } from './pages/LikedVideos'
 
 const PageLayout = ({ children }) => {
   return (
@@ -48,6 +48,7 @@ function AppContent() {
       <Route path="/search" element={<PageLayout><Search /></PageLayout>} />
       <Route path="/upload" element={<PageLayout><Upload /></PageLayout>} />
       <Route path="/playlists" element={<PageLayout><Playlists /></PageLayout>} />
+      <Route path="/liked-vidoes" element={<PageLayout><Liked_Vidoes /></PageLayout>} />
       <Route path="/profile" element={<PageLayout><Profile /></PageLayout>} />
       <Route path="/subscriptions" element={<PageLayout><Subscriptions /></PageLayout>} />
       <Route path="/history" element={<PageLayout><History /></PageLayout>} />
@@ -64,7 +65,7 @@ function App() {
           <UIProvider>
             <AppContent />
 
-            <VideoPreviewModal />
+
             <ToastContainer />
           </UIProvider>
         </VideoProvider>

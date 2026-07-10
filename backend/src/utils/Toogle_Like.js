@@ -7,24 +7,24 @@ import { ApiResponse } from "./Api_Response.js";
 
 
 export const toggleLike = async ({ entityId, entityKey, userId }, res) => {
-  if (!isValidObjectId(entityId)) {
-    throw new ApiError(400, `Invalid ${entityKey} ID`);
-  }
+    if (!isValidObjectId(entityId)) {
+        throw new ApiError(400, `Invalid ${entityKey} ID`);
+    }
 
-  const isLiked = await Like.findOne({
-    [entityKey]: entityId,
-    likedBy: userId,
-  });
+    const isLiked = await Like.findOne({
+        [entityKey]: entityId,
+        likedBy: userId,
+    });
 
-  if (isLiked) {
-    await Like.findByIdAndDelete(isLiked._id);
-    return res.status(200).json(new ApiResponse(200, { isLiked: false }));
-  }
+    if (isLiked) {
+        await Like.findByIdAndDelete(isLiked._id);
+        return res.status(200).json(new ApiResponse(200, { isLiked: false }));
+    }
 
-  await Like.create({
-    [entityKey]: entityId,
-    likedBy: userId,
-  });
+    await Like.create({
+        [entityKey]: entityId,
+        likedBy: userId,
+    });
 
-  return res.status(200).json(new ApiResponse(200, { isLiked: true }));
+    return res.status(200).json(new ApiResponse(200, { isLiked: true }));
 };

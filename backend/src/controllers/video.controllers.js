@@ -205,6 +205,7 @@ const getVideoById = asyncHandler(async (req, res) => {
               createdAt: 1,
               "comment_owner.username": 1,
               "comment_owner.avatar": 1,
+              "comment_owner._id": 1,
             },
           },
         ],

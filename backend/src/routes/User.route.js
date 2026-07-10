@@ -48,10 +48,10 @@ router
   .route("/update-account")
   .post(VerifyJWT, UpdateAccountDetails); /* it should be post*/
 
-router.route("/avatar").patch(VerifyJWT, upload.single("avatar"), UpdateAvatar);
+router.route("/change-avatar").patch(VerifyJWT, upload.single("avatar"), UpdateAvatar);
 
 router
-  .route("/cover-image")
+  .route("/change-cover-image")
   .patch(VerifyJWT, upload.single("coverImage"), UpdateCoverImage);
 
 router.route("/c/:username").get(GetUserChannelProfile);

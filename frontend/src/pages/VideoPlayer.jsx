@@ -214,7 +214,7 @@ export const VideoPlayer = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-4">
           <div className="w-full aspect-video bg-black rounded-xl overflow-hidden">
-            <video src={video.videoFile?.url} controls className="w-full h-full" controlsList="nodownload" />
+            <video src={video.videoFile?.url} controls autoPlay className="w-full h-full" controlsList="nodownload" />
           </div>
 
           <div>

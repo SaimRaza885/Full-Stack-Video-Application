@@ -6,7 +6,7 @@ import { dashboardAPI, userAPI } from '../services/endpoints'
 import { fmt } from '../utils'
 
 export const Profile = () => {
-  const { user, updateProfile } = useAuth()
+  const { user, updateProfile, setUser, loading: authLoding } = useAuth()
   const { addNotification, removeNotification } = useUI()
 
   // Input DOM References
@@ -33,6 +33,7 @@ export const Profile = () => {
     if (user) {
       setFormData({ fullName: user.fullName || '' })
       setCoverPreview(user.coverImage?.url || null)
+      console.log(user)
       fetchStats()
     }
   }, [user?._id])
@@ -78,33 +79,46 @@ export const Profile = () => {
     const file = e.target.files?.[0]
     if (!file) return
 
+    let newurl = URL.createObjectURL(file)
+    setAvatarPreview(newurl)
+    setUser((prev) => ({ ...prev, avatar: { url: newurl } }))
+
     let loadingNotificationId = null
     try {
       loadingNotificationId = addNotification("Uploading your avatar... please wait.", 'info', 0)
-
+      console.log("user old data:", user.avatar)
       const uploadPayload = new FormData()
       uploadPayload.append('avatar', file)
 
       const response = await userAPI.changeAvatar(uploadPayload)
       const updatedUser = response.data?.data
 
+      console.log("user old data:", updatedUser.avatar)
+
       if (loadingNotificationId) removeNotification(loadingNotificationId)
 
       if (updatedUser) {
         addNotification("Avatar updated successfully!", 'success')
         setAvatarPreview(updatedUser.avatar?.url)
+        setUser((prev) => ({ ...prev, avatar: updatedUser.avatar }))
       }
+
+
     } catch (error) {
       console.error(error)
       if (loadingNotificationId) removeNotification(loadingNotificationId)
       addNotification("Failed to update avatar", 'error')
       setAvatarPreview(user?.avatar?.url || null)
+      setUser((prev) => ({ ...prev, avatar: user.avatar }))
     }
   }
 
   const handleCoverImageUpdate = async (e) => {
     const file = e.target.files?.[0]
     if (!file) return
+
+    let newurl = URL.createObjectURL(file);
+    setCoverPreview(newurl);
 
     let loadingNotificationId = null
     try {
@@ -122,6 +136,7 @@ export const Profile = () => {
       if (updatedUser) {
         addNotification("Banner updated successfully!", 'success')
         setCoverPreview(updatedUser.coverImage?.url || null)
+        setUser((prev) => ({ ...prev, coverImage: updatedUser.coverImage }))
 
       }
     } catch (error) {
@@ -136,6 +151,9 @@ export const Profile = () => {
     return <div className="container-custom py-12 text-text-secondary text-center">Please log in to view your profile</div>
   }
 
+  if (authLoding) {
+    return <div className="container-custom py-12 text-text-secondary text-center">Loading...</div>
+  }
   // Safe Calculation Fallbacks to secure UI shell layout metrics
   const calculateSubRatio = () => {
     if (!stats?.totalViews || !stats?.totalSubscribers) return "0.00"
@@ -187,7 +205,7 @@ export const Profile = () => {
               className="relative group cursor-pointer"
               onClick={() => fileInputRef.current?.click()}
             >
-              <Avatar src={avatarPreview || user.avatar.url} size="xl" className="w-24 h-24 sm:w-28 sm:h-28 border-4 border-background/80 shadow-2xl ring-2 ring-accent/30 object-cover rounded-full" />
+              <Avatar src={avatarPreview || user.avatar?.url} size="xl" className="w-24 h-24 sm:w-28 sm:h-28 border-4 border-background/80 shadow-2xl ring-2 ring-accent/30 object-cover rounded-full" />
               <input
                 type="file"
                 ref={fileInputRef}
@@ -203,7 +221,7 @@ export const Profile = () => {
             <div className="space-y-1.5 pt-2">
               <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-3">
                 <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight bg-gradient-to-r from-white via-zinc-200 to-zinc-400 bg-clip-text text-transparent">{user.fullName}</h1>
-                <span className="px-2.5 py-0.5 bg-accent/10 border border-accent/20 rounded-full text-[11px] font-semibold text-accent tracking-wider uppercase">Partner</span>
+                <span className="px-2.5 py-0.5 bg-accent text-white border border-accent/20 rounded-full text-[11px] font-semibold text-accent tracking-wider uppercase">Partner</span>
               </div>
               <p className="text-accent font-medium text-base">@{user.username}</p>
               <p className="text-text-tertiary text-xs flex items-center justify-center sm:justify-start gap-1.5">

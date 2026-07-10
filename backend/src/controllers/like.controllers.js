@@ -18,14 +18,6 @@ const toggleCommentLike = asyncHandler(async (req, res) => {
   return await toggleLike({ entityId: commentId, entityKey: "comment", userId }, res);
 });
 
-const toggleTweetLike = asyncHandler(async (req, res) => {
-  const { tweetId } = req.params;
-  const userId = req.user?._id;
-
-  return await toggleLike({ entityId: tweetId, entityKey: "tweet", userId }, res);
-});
-
-
 const getLikedVideos = asyncHandler(async (req, res) => {
   //TODO: get all liked videos
 
@@ -97,4 +89,4 @@ const getLikedVideos = asyncHandler(async (req, res) => {
     );
 });
 
-export { toggleCommentLike, toggleTweetLike, toggleVideoLike, getLikedVideos };
+export { toggleCommentLike, toggleVideoLike, getLikedVideos };

@@ -6,8 +6,6 @@ export const UIProvider = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [darkMode, setDarkMode] = useState(true)
   const [notifications, setNotifications] = useState([])
-  const [showUploadModal, setShowUploadModal] = useState(false)
-  const [showVideoPreview, setShowVideoPreview] = useState(false)
   const [selectedVideo, setSelectedVideo] = useState(null)
   const [uploads, setUploads] = useState([])
 
@@ -33,15 +31,6 @@ export const UIProvider = ({ children }) => {
     setNotifications((prev) => prev.filter((n) => n.id !== id))
   }, [])
 
-  const openVideoPreview = useCallback((video) => {
-    setSelectedVideo(video)
-    setShowVideoPreview(true)
-  }, [])
-
-  const closeVideoPreview = useCallback(() => {
-    setShowVideoPreview(false)
-    setTimeout(() => setSelectedVideo(null), 300)
-  }, [])
 
   const addUpload = useCallback((id, fileName) => {
     setUploads((prev) => [...prev, { id, fileName, progress: 0, status: 'uploading' }])
@@ -63,14 +52,10 @@ export const UIProvider = ({ children }) => {
     notifications,
     addNotification,
     removeNotification,
-    showUploadModal,
-    setShowUploadModal,
-    showVideoPreview,
-    setShowVideoPreview,
+
     selectedVideo,
     setSelectedVideo,
-    openVideoPreview,
-    closeVideoPreview,
+
     uploads,
     addUpload,
     updateUpload,

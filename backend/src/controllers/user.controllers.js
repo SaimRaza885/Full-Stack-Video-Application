@@ -1,9 +1,10 @@
 import jwt from "jsonwebtoken";
+import fs from "fs";
 import { User } from "../models/user.model.js";
 import { ApiError } from "../utils/Api_Error.js";
 import { ApiResponse } from "../utils/Api_Response.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
-import { Cloudinary_File_Upload } from "../utils/Cloudinary.js";
+import { Cloudinary_File_Upload, deleteOnCloudinary } from "../utils/Cloudinary.js";
 import mongoose from "mongoose";
 
 const GenerateAccessAndRefreshToken = async (userId) => {
@@ -26,19 +27,8 @@ const GenerateAccessAndRefreshToken = async (userId) => {
 };
 
 const registerUser = asyncHandler(async (req, res) => {
-  // Steps for user registration
-
-  // Get user infromtaion from frontend (Postman)
-  // Valitdation (any sapces or empty field)
-  // Check If USER All REady Exist
-  // Images Uploaded Corecttly specially (Avatar)
-  // Upload them to cloudinary (Avatar)
-  // Now Crate a user OBJECT - create entry in DB
-  // Remove Password and Refresh Token from the Response
-  // Check For User Creation
-  // Reutrn Response
-
   const { username, email, password, fullName } = req.body;
+
   if (
     [username, email, password, fullName].some((field) => field?.trim() === "")
   ) {
@@ -51,36 +41,47 @@ const registerUser = asyncHandler(async (req, res) => {
   }
 
   const localAvatarPath = req.files?.avatar?.[0]?.path;
-  let localCoverImagePath;
-  let avatarUrl = "";
+  if (!localAvatarPath) {
+    throw new ApiError(400, "Avatar profile image file is required");
+  }
 
-  if (localAvatarPath) {
-    const avatar = await Cloudinary_File_Upload(localAvatarPath);
-    if (avatar?.url) {
-      avatarUrl = avatar.url;
+  const localCoverImagePath = req.files?.coverImage?.[0]?.path || req.files?.coverimage?.[0]?.path;
+
+  const avatar = await Cloudinary_File_Upload(localAvatarPath);
+  if (!avatar?.url) {
+    throw new ApiError(400, "Failed to upload avatar to Cloudinary");
+  }
+  const avatarData = { url: avatar.url, public_id: avatar.public_id };
+
+  let coverImageData = { url: '', public_id: '' };
+  if (localCoverImagePath) {
+    const coverImage = await Cloudinary_File_Upload(localCoverImagePath);
+    if (!coverImage?.url) {
+      throw new ApiError(400, "Failed to upload cover image to Cloudinary");
     }
+    coverImageData = { url: coverImage.url, public_id: coverImage.public_id };
   }
 
-  if (
-    req.files &&
-    Array.isArray(req.files.coverImage) &&
-    req.files.coverImage.length > 0
-  ) {
-    localCoverImagePath = req.files.coverImage[0].path;
-  }
+  [localAvatarPath, localCoverImagePath].forEach((p) => {
+    if (p && fs.existsSync(p)) {
+      fs.unlinkSync(p);
+    }
+  });
 
-  const coverImage = await Cloudinary_File_Upload(localCoverImagePath);
 
-  // console.log(localAvatarPath)
 
   const user = await User.create({
     fullName,
-    avatar: avatarUrl,
-    coverImage: coverImage?.url || "",
+    avatar: avatarData,
+    coverImage: coverImageData,
     email,
     password,
     username: username.toLowerCase(),
   });
+
+  if (!user) {
+    throw new ApiError(500, "Faild to create the user ")
+  }
 
   const userCreated = await User.findById(user._id).select(
     "-password -refreshToken"
@@ -113,7 +114,6 @@ const registerUser = asyncHandler(async (req, res) => {
       )
     );
 });
-
 const loginUser = asyncHandler(async (req, res) => {
   // Algorithm
   // get data form (req.body)
@@ -345,27 +345,41 @@ const UpdateAccountDetails = asyncHandler(async (req, res) => {
 
 const UpdateAvatar = asyncHandler(async (req, res) => {
   const avatarLocalPath = req.file?.path;
-
   if (!avatarLocalPath) {
     throw new ApiError(400, "Avatar file path is missing");
   }
 
-  const avatarUploadResult = await Cloudinary_File_Upload(avatarLocalPath);
 
+  const oldPublicId = req.user?.avatar?.public_id;
+
+
+  const avatarUploadResult = await Cloudinary_File_Upload(avatarLocalPath);
   if (!avatarUploadResult?.url) {
     throw new ApiError(400, "Failed to upload avatar to Cloudinary");
   }
 
+  const AvatarData = {
+    url: avatarUploadResult.url,
+    public_id: avatarUploadResult.public_id
+  };
+
+  // 3. Update DB record 
   const updatedUser = await User.findByIdAndUpdate(
     req.user._id,
-    {
-      $set: { avatar: avatarUploadResult.url },
-    },
+    { $set: { avatar: AvatarData } },
     { new: true }
   ).select("-password");
 
   if (!updatedUser) {
     throw new ApiError(500, "Failed to update avatar in the database");
+  }
+
+
+  if (oldPublicId) {
+    const wasDeleted = await deleteOnCloudinary(oldPublicId);
+    if (!wasDeleted) {
+      console.log(`⚠️ Warning: Previous asset (${oldPublicId}) failed to clear from Cloudinary servers.`);
+    }
   }
 
   return res
@@ -375,11 +389,14 @@ const UpdateAvatar = asyncHandler(async (req, res) => {
 
 // Updating file (CoverImage)
 const UpdateCoverImage = asyncHandler(async (req, res) => {
+
   const localPath = req.file?.path;
+  const oldPublicId = req.user?.coverImage?.public_id
 
   if (!localPath) {
     throw new ApiError(400, "Cover image file path is missing");
   }
+  let CoverImageData = { url: '', public_id: '' }
 
   const uploadResult = await Cloudinary_File_Upload(localPath);
 
@@ -387,11 +404,13 @@ const UpdateCoverImage = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Failed to upload cover image to Cloudinary");
   }
 
+  CoverImageData = { url: uploadResult.url, public_id: uploadResult.public_id };
+
   const updatedUser = await User.findByIdAndUpdate(
     req.user._id,
     {
       $set: {
-        coverImage: uploadResult.url,
+        coverImage: CoverImageData,
       },
     },
     { new: true }
@@ -401,6 +420,13 @@ const UpdateCoverImage = asyncHandler(async (req, res) => {
     throw new ApiError(500, "Failed to update cover image in the database");
   }
 
+  if (oldPublicId) {
+    const wasDeleted = await deleteOnCloudinary(oldPublicId);
+    if (!wasDeleted) {
+      console.log(`⚠️ Warning: Previous asset (${oldPublicId}) failed to clear from Cloudinary servers.`);
+    }
+
+  }
   return res.status(200).json(
     new ApiResponse(
       200,
