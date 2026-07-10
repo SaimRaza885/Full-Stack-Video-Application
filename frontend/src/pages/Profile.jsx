@@ -258,7 +258,7 @@ export const Profile = () => {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5">
             <Card className="p-6 bg-secondary/40 border border-white/5 rounded-2xl flex flex-col justify-between hover:border-accent/30 transition-all duration-300 group shadow-md backdrop-blur-sm">
               <div className="flex items-center justify-between">
                 <span className="text-text-tertiary text-xs font-bold tracking-wider uppercase">Subscribers</span>
@@ -284,6 +284,19 @@ export const Profile = () => {
                 </div>
               </div>
             </Card>
+
+
+            <Card className="p-6 bg-secondary/40 border border-white/5 rounded-2xl flex flex-col justify-between hover:border-accent/30 transition-all duration-300 group shadow-md backdrop-blur-sm">
+
+              <div className="mt-4 space-y-1">
+                <h3 className="text-3xl font-extrabold tracking-tight">{statsLoading ? '...' : fmt((stats?.totalViews * 4.2)).split('.')[0]} <span className="text-sm font-medium text-text-tertiary">hrs</span></h3>
+                <div className="flex items-center gap-1.5 text-xs font-semibold text-rose-500">
+                  <span>▼ -1.2%</span>
+                  <span className="text-text-tertiary font-normal">retention drop</span>
+                </div>
+              </div>
+            </Card>
+
 
             <Card className="p-6 bg-secondary/40 border border-white/5 rounded-2xl flex flex-col justify-between hover:border-accent/30 transition-all duration-300 group shadow-md backdrop-blur-sm">
               <div className="flex items-center justify-between">

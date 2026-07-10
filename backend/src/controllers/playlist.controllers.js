@@ -7,14 +7,10 @@ import { Video } from "../models/video.model.js";
 
 const createPlaylist = asyncHandler(async (req, res) => {
   //TODO: create playlist
-  const { name, description } = req.body;
+  const { name, description = "" } = req.body;
 
   if (!name) {
     throw new ApiError(400, "PlayList Name is requried");
-  }
-
-  if (!description) {
-    description = "";
   }
 
   const playlist = await PlayList.create({
