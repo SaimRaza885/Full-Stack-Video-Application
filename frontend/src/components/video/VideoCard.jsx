@@ -25,7 +25,7 @@ export const VideoCard = ({ video, horizontal = true }) => {
           <h4 className="text-sm font-semibold text-[#F0F0F8] leading-5 line-clamp-2">
             {video.title || 'Untitled Video'}
           </h4>
-          <p className="text-xs text-[#6B6B80] mt-1">{channelName} ooooooooooo</p>
+          <p className="text-xs text-[#6B6B80] mt-1">{channelName} </p>
           <p className="text-xs text-[#6B6B80]/70 mt-0.5">{fmt(video.views)} views &bull; {ago(video.createdAt)}</p>
         </div>
       </div>

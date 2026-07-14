@@ -16,7 +16,6 @@ export const NewVideoCard = ({ video, ch = "", horizontal = false }) => {
         ownerDetails,
     } = video
 
-    // Use ownerDetails if available, otherwise fallback to owner
     if (ch) {
         video.ownerDetails = ch
     }
@@ -39,35 +38,32 @@ export const NewVideoCard = ({ video, ch = "", horizontal = false }) => {
 
     if (horizontal) {
         return (
-            <Link
-                to={`/video/${_id}`}
-                className="group flex gap-3"
-            >
-                {/* Thumbnail */}
-                <div className="relative aspect-video w-40 shrink-0 overflow-hidden rounded-xl bg-tertiary lg:w-48">
+            <div className="group flex gap-3">
+                {/* Clickable Thumbnail Block */}
+                <Link
+                    to={`/video/${_id}`}
+                    className="relative aspect-video w-40 shrink-0 overflow-hidden rounded-xl bg-tertiary lg:w-48"
+                >
                     <img
                         src={thumbnailUrl}
                         alt={title}
                         loading="lazy"
                         className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
                     />
-
                     <DurationBadge seconds={duration} />
-                </div>
+                </Link>
 
-
-                {/* Content */}
+                {/* Content Block */}
                 <div className="flex min-w-0 flex-1 flex-col">
-                    <h4 className="line-clamp-2 text-sm font-semibold leading-5 text-text-primary transition-colors group-hover:text-accent">
-                        {title || "Untitled Video"}
-                    </h4>
+                    <Link to={`/video/${_id}`}>
+                        <h4 className="line-clamp-2 text-sm font-semibold leading-5 text-text-primary transition-colors group-hover:text-accent">
+                            {title || "Untitled Video"}
+                        </h4>
+                    </Link>
 
-                    <div className="flex ">
-
-
+                    <div className="flex">
                         <Link
                             to={`/channel/${username}`}
-                            onClick={(e) => e.stopPropagation()}
                             className="mt-1 w-fit text-xs text-text-secondary transition-colors hover:text-text-primary"
                         >
                             {username}
@@ -78,7 +74,7 @@ export const NewVideoCard = ({ video, ch = "", horizontal = false }) => {
                         {fmt(views)} views • {ago(createdAt)}
                     </p>
                 </div>
-            </Link>
+            </div>
         )
     }
 
@@ -92,19 +88,14 @@ export const NewVideoCard = ({ video, ch = "", horizontal = false }) => {
                         alt={title}
                         className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
                     />
-
                     <DurationBadge seconds={duration} />
                 </div>
             </Link>
 
-
             {/* Video Info */}
             <div className="mt-3 flex gap-3">
                 {/* Channel Avatar */}
-                <Link
-                    to={`/channel/${username}`}
-                    className="shrink-0"
-                >
+                <Link to={`/channel/${username}`} className="shrink-0">
                     <img
                         src={avatarUrl}
                         alt={fullName}

@@ -12,7 +12,7 @@ import {
   VideoSection, VideoHeader, VideoActions, ChannelCard,
   VideoDescription, CommentSection, RelatedVideos,
 } from '../components/videoPlayer'
-
+import ad_image from '../tokens/ad_image.jpg';
 export const VideoPlayer = () => {
   const { videoId } = useParams()
   const { user, isAuthenticated } = useAuth()
@@ -47,7 +47,7 @@ export const VideoPlayer = () => {
             <VideoSection
               video={video}
               adVideo={{
-                image: 'https://img.youtube.com/vi/i5ChP35iJPw/maxresdefault.jpg',
+                image: ad_image,
                 skipAfter: 5,
                 title: 'Discover Premium',
                 description: 'Unlock exclusive content with our premium plan.',
@@ -144,7 +144,7 @@ export const VideoPlayer = () => {
           )}
         </div>
 
-        <RelatedVideos videos={relatedVideos} loading={relatedLoading} />
+        <RelatedVideos videos={relatedVideos} loading={loading} relatedvideos_loading={relatedLoading} />
       </div>
     </div>
   )

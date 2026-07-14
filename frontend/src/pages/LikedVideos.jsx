@@ -1,9 +1,7 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
 import { likeAPI } from '../services/endpoints'
 import { Skeleton } from '../components'
 import { useAuth } from '../context/AuthContext'
-import { fmt, ago } from '../utils'
 import { NewVideoCard } from '../components/NewVideoCard'
 
 export const Liked_Vidoes = () => {

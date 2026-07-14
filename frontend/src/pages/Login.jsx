@@ -1,37 +1,16 @@
-import { useState } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
-import { useAuth } from '../context/AuthContext'
-import { useUI } from '../context/UIContext'
-import { Button, Input } from '../components'
+import { Link } from 'react-router-dom'
+import { useLogin } from '../hooks/useLogin'
+import { LoginForm } from '../components/auth/LoginForm'
 
 export const Login = () => {
-  const [formData, setFormData] = useState({ email: '', password: '' })
-  const [errors, setErrors] = useState({})
-  const { login, loading, error } = useAuth()
-  const { addNotification } = useUI()
-  const navigate = useNavigate()
-
-  const handleChange = (e) => {
-    const { name, value } = e.target
-    setFormData(prev => ({ ...prev, [name]: value }))
-    if (errors[name]) setErrors(prev => ({ ...prev, [name]: '' }))
-  }
-
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-    const newErrors = {}
-    if (!formData.email) newErrors.email = 'Email is required'
-    if (!formData.password) newErrors.password = 'Password is required'
-    if (Object.keys(newErrors).length > 0) { setErrors(newErrors); return }
-
-    const result = await login(formData.email, formData.password)
-    if (result.success) {
-      addNotification('Login successful!', 'success')
-      navigate('/')
-    } else {
-      addNotification(result.error, 'error')
-    }
-  }
+  const {
+    formData,
+    errors,
+    loading,
+    error,
+    handleChange,
+    handleSubmit
+  } = useLogin()
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-surface px-4">
@@ -46,11 +25,13 @@ export const Login = () => {
             <div className="mb-4 rounded-lg border border-red-500/40 bg-red-500/10 px-4 py-2 text-sm text-red-400">{error}</div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <Input label="Email" type="email" name="email" value={formData.email} onChange={handleChange} placeholder="your@email.com" error={errors.email} />
-            <Input label="Password" type="password" name="password" value={formData.password} onChange={handleChange} placeholder="••••••••" error={errors.password} />
-            <Button fullWidth loading={loading} type="submit">Sign In</Button>
-          </form>
+          <LoginForm 
+            formData={formData}
+            errors={errors}
+            handleChange={handleChange}
+            handleSubmit={handleSubmit}
+            loading={loading}
+          />
 
           <div className="flex items-center gap-4 my-6">
             <div className="h-px flex-1 bg-border" />
@@ -67,3 +48,4 @@ export const Login = () => {
     </div>
   )
 }
+

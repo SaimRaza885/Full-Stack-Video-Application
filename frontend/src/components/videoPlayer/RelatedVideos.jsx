@@ -15,14 +15,13 @@ const Skeleton = () => (
   </div>
 )
 
-export const RelatedVideos = ({ videos, loading }) => (
+export const RelatedVideos = ({ videos, loading, relatedvideos_loading }) => (
   <div>
     <h2 className="text-lg font-bold text-text-primary mb-4">Related Videos</h2>
-    {loading ? (
+    {loading || relatedvideos_loading ? (
       <Skeleton />
     ) : videos.length > 0 ? (
       <div className="space-y-4">
-        {console.log(videos)}
         {videos.map(v => (
           <NewVideoCard key={v._id} video={v} horizontal />
         ))}

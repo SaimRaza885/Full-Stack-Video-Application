@@ -1,34 +1,10 @@
-import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
-import { userAPI } from '../services/endpoints'
-import { useAuth } from '../context/AuthContext'
-import { Skeleton, EmptyState, ErrorState, VideoCard } from '../components'
+import { useHistory } from '../hooks/useHistory'
+import { Skeleton, EmptyState, ErrorState } from '../components'
 import { History as HistoryIcon } from 'lucide-react'
-import { fmt, ago } from '../utils'
 import { NewVideoCard } from '../components/NewVideoCard'
 
 export const History = () => {
-  const { user } = useAuth()
-  const [videos, setVideos] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
-
-  useEffect(() => {
-    if (!user) { setLoading(false); return }
-    const fetchHistory = async () => {
-      try {
-        setLoading(true)
-        setError(null)
-        const res = await userAPI.getHistory()
-        setVideos(res.data.data || [])
-      } catch {
-        setError('Failed to load history')
-      } finally {
-        setLoading(false)
-      }
-    }
-    fetchHistory()
-  }, [user])
+  const { user, videos, loading, error } = useHistory()
 
   if (!user) return <div className="container-custom py-8 text-center text-text-secondary">Please log in to view history</div>
   if (loading) return <div className="container-custom py-8"><Skeleton className="w-full h-48 rounded-xl mb-4" /><Skeleton className="w-full h-48 rounded-xl" /></div>

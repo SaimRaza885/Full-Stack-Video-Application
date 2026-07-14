@@ -82,17 +82,29 @@ export const VideoSection = ({ video, adVideo, onNextVideo, onPrevVideo }) => {
   }, [phase])
 
   // Keyboard Navigation
+  // Keyboard Navigation
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (e.target.tagName === 'INPUT' || phase === 'ad') return
-      if (e.code === 'Space') { e.preventDefault(); togglePlay() }
-      else if (e.code === 'ArrowRight') { e.preventDefault(); if (onNextVideo) onNextVideo() }
-      else if (e.code === 'ArrowLeft') { e.preventDefault(); if (onPrevVideo) onPrevVideo() }
-    }
-    window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [isPlaying, phase, onNextVideo, onPrevVideo])
+      if (e.target.tagName === 'INPUT' || phase === 'ad') return;
 
+      if (e.code === 'Space') {
+        e.preventDefault();
+        togglePlay();
+      } else if (e.code === 'ArrowRight') {
+        e.preventDefault();
+        if (onNextVideo) onNextVideo();
+      } else if (e.code === 'ArrowLeft') {
+        e.preventDefault();
+        if (onPrevVideo) onPrevVideo();
+      } else if (e.code === 'KeyF') { // Added 'F' key support here
+        e.preventDefault();
+        toggleFullscreen();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [phase, onNextVideo, onPrevVideo]);
   // Close speed popup on outside click
   useEffect(() => {
     const clickOutside = (e) => {
@@ -123,7 +135,14 @@ export const VideoSection = ({ video, adVideo, onNextVideo, onPrevVideo }) => {
 
   // Fullscreen listener
   useEffect(() => {
-    const onChange = () => setIsFullscreen(!!document.fullscreenElement)
+    const onChange = (e) => {
+      if (e.code === 'f') {
+        e.preventDefault();
+        setIsFullscreen(!!document.fullscreenElement)
+      }
+      setIsFullscreen(!!document.fullscreenElement)
+    }
+
     document.addEventListener('fullscreenchange', onChange)
     return () => document.removeEventListener('fullscreenchange', onChange)
   }, [])
@@ -266,9 +285,9 @@ export const VideoSection = ({ video, adVideo, onNextVideo, onPrevVideo }) => {
 
       {/* ---- Static Center Play Overlay ---- */}
       {phase === 'main' && !isPlaying && !isBuffering && showControls && (
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+        <div onClick={togglePlay} className="absolute inset-0 flex items-center justify-center pointer-events-none">
           <button
-            onClick={togglePlay}
+
             className="w-16 h-16 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center hover:bg-indigo-500/20 hover:scale-105 border border-white/20 transition-all pointer-events-auto"
           >
             <svg viewBox="0 0 24 24" fill="white" className="w-8 h-8 ml-1">
