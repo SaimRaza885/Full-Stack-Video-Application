@@ -5,35 +5,37 @@ import { Button, Skeleton } from '../../components'
 
 export const PlaylistDetails = ({
     selectedPlaylist,
-    setSelectedPlaylist,
-    setPlaylistVideos,
     playlistVideos,
-    setEditingPlaylist,
-    setEditName,
-    setEditDescription,
-    setShowEditModal,
+    handleBack,
+    handleOpenEdit,
     handleDeletePlaylist,
-    addVideoId,
-    setAddVideoId,
-    addingVideo,
-    handleAddVideo,
-    toggleUserVideos,
-    showUserVideos,
-    loadingUserVideos,
-    userVideos,
-    handleSelectUserVideo,
-    addingUserVideo,
-    hasMoreUserVideos,
-    fetchUserVideos,
-    userVideoPage,
-    loadingMoreVideos,
-    handleRemoveVideo,
-    removingVideo
+    addVideo: {
+        addVideoId,
+        setAddVideoId,
+        addingVideo,
+        handleAddVideo,
+    },
+    userVideoBrowser: {
+        userVideos,
+        loadingUserVideos,
+        showUserVideos,
+        toggleUserVideos,
+        handleSelectUserVideo,
+        addingUserVideo,
+        hasMoreUserVideos,
+        fetchUserVideos,
+        userVideoPage,
+        loadingMoreVideos,
+    },
+    removeVideo: {
+        removingVideo,
+        handleRemoveVideo,
+    },
 }) => {
     return (
         <div>
             <button
-                onClick={() => { setSelectedPlaylist(null); setPlaylistVideos([]) }}
+                onClick={handleBack}
                 className="mb-4 flex items-center gap-2 text-accent hover:text-accent-hover transition-colors text-sm font-medium"
             >
                 <ArrowLeft className="w-4 h-4" />
@@ -43,12 +45,7 @@ export const PlaylistDetails = ({
                 <h2 className="text-xl font-bold text-text-primary">{selectedPlaylist.name}</h2>
                 <div className="flex items-center gap-2">
                     <button
-                        onClick={() => {
-                            setEditingPlaylist(selectedPlaylist)
-                            setEditName(selectedPlaylist.name)
-                            setEditDescription(selectedPlaylist.description || '')
-                            setShowEditModal(true)
-                        }}
+                        onClick={handleOpenEdit}
                         className="flex items-center gap-1.5 px-3 py-1.5 bg-tertiary text-text-secondary rounded-lg text-sm font-medium hover:bg-elevated transition-colors"
                     >
                         <Pencil className="w-4 h-4" />

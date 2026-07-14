@@ -188,48 +188,75 @@ export const usePlaylists = () => {
         }
     }
 
+    const handleBack = () => {
+        setSelectedPlaylist(null)
+        setPlaylistVideos([])
+    }
+
+    const handleOpenEdit = () => {
+        setEditingPlaylist(selectedPlaylist)
+        setEditName(selectedPlaylist.name)
+        setEditDescription(selectedPlaylist.description || '')
+        setShowEditModal(true)
+    }
+
     return {
         user,
-        playlists,
         loading,
         error,
-        selectedPlaylist,
-        setSelectedPlaylist,
-        playlistVideos,
-        setPlaylistVideos,
-        showModal,
-        setShowModal,
-        newPlaylistName,
-        setNewPlaylistName,
-        newPlaylistDescription,
-        setNewPlaylistDescription,
-        addVideoId,
-        setAddVideoId,
-        addingVideo,
-        showEditModal,
-        setShowEditModal,
-        editingPlaylist,
-        setEditingPlaylist,
-        editName,
-        setEditName,
-        editDescription,
-        setEditDescription,
-        removingVideo,
-        userVideos,
-        loadingUserVideos,
-        showUserVideos,
-        userVideoPage,
-        hasMoreUserVideos,
-        loadingMoreVideos,
-        addingUserVideo,
+        playlists,
         handleSelectPlaylist,
-        handleCreatePlaylist,
-        handleAddVideo,
-        handleDeletePlaylist,
-        handleEditPlaylist,
-        handleRemoveVideo,
-        fetchUserVideos,
-        handleSelectUserVideo,
-        toggleUserVideos
+
+        detail: {
+            selectedPlaylist,
+            playlistVideos,
+            handleBack,
+            handleOpenEdit,
+            handleDeletePlaylist,
+            addVideo: {
+                addVideoId,
+                setAddVideoId,
+                addingVideo,
+                handleAddVideo,
+            },
+            userVideoBrowser: {
+                userVideos,
+                loadingUserVideos,
+                showUserVideos,
+                toggleUserVideos,
+                handleSelectUserVideo,
+                addingUserVideo,
+                hasMoreUserVideos,
+                fetchUserVideos,
+                userVideoPage,
+                loadingMoreVideos,
+            },
+            removeVideo: {
+                removingVideo,
+                handleRemoveVideo,
+            },
+        },
+
+        create: {
+            showModal,
+            setShowModal,
+            newPlaylistName,
+            setNewPlaylistName,
+            newPlaylistDescription,
+            setNewPlaylistDescription,
+            handleCreatePlaylist,
+        },
+
+        edit: {
+            showEditModal,
+            setShowEditModal,
+            editingPlaylist,
+            setEditingPlaylist,
+            editName,
+            setEditName,
+            editDescription,
+            setEditDescription,
+            handleEditPlaylist,
+        },
     }
 }

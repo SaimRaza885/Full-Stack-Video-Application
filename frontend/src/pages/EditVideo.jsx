@@ -3,11 +3,11 @@ import { Skeleton } from '../components'
 import { ArrowLeft } from 'lucide-react'
 import { useEditVideo } from '../hooks/useEditVideo'
 import { EditVideoForm } from '../components/video/EditVideoForm'
-import { useSearchParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
+
 
 const EditVideo = () => {
-    const { videoId } = useSearchParams
-
+    const { videoId } = useParams();
     const {
         authLoading,
         loading,
